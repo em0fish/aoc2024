@@ -1,3 +1,4 @@
+# checks the format and it its correct, returns the value of mul(a,b)
 def splitter(s):
     #print(s)
     l = s.split(",")
@@ -10,9 +11,9 @@ def splitter(s):
 
 inString = open("input3.txt").read()
 
+### part 2
+# throw out all segments between don't() and do() as theyre not counted
 while True:
-    #print("--------------")
-    #print(len(inString))
     ind1 = inString.find("don't()")
     if ind1 == -1:
         break
@@ -20,26 +21,16 @@ while True:
     if ind2 == -1:
         inString = inString[:ind1]
         break
-    print("ind1: ", ind1, "ind2: ", ind2)
     inString = inString[:ind1] + inString[(ind2+4):]
+### part 2 end
 
-# - find "don't()" => ind1
-#     - if ind1 == -1: 
-#         break
-# - find "do()" => ind2
-#     - if ind2 == -1:
-#           inString = inString[ind1:]
-#           break 
-# - inString = inString[:ind1] + inString[ind2:]
 
 out = 0
 while True:
-    #print(inString)
     ind1 = inString.find("mul(")
     inString = inString[ind1:]
     ind2 = inString.find(")")
     if ind1 == -1 or ind2 == -1: break
-    #print("ind1: ",ind1,", ind2: ",ind2)
     if ind2-4 < 3 or ind2-4 > 8: 
         inString = inString[4:]
         continue
@@ -47,6 +38,3 @@ while True:
     if res != -1: 
         out += res
     inString = inString[ind2:]
-
-print(out)
-## 190815282 - too high
