@@ -1,3 +1,5 @@
+import copy
+
 inString = open("input9.txt").read().strip()
 
 # split the input into files and gaps
@@ -8,16 +10,6 @@ for i, num in enumerate(inString):
         files.append(int(num))
     else:
         gaps.append(int(num))
-
-# only usable / readable when the max index of file < 10
-def tabToStringTest(tab):
-    out = ""
-    for i in range(len(tab)):
-        if tab[i] == -1:
-            out += "."
-        else:
-            out += str(tab[i])
-    return out
 
 # returns a table representing the state of memory
 # specified by `gaps`, `files`.
@@ -36,6 +28,25 @@ def buildTab1(gaps, files):
         i += 1
         j += 1
     return out
+
+def part1(gaps, files):
+    # break condition: trying to add a file with id i
+    # to a gap with index >= i
+    breakLoops = False
+    indG = 0
+    indF = len(files) - 1
+    while not breakLoops:
+        movedFiles = []
+        while gaps[indG] > len(movedFiles) and not breakLoops:
+            movedFiles.append(indF)
+            files[indF] = files[indF] - 1
+            if files[indF] == 0:
+                indF -= 1
+            if indG >= indF:
+                breakLoops = True
+        gaps[indG] = movedFiles
+        indG += 1
+    return gaps, files
 
 # same functionality as buildTab1, but modified
 # for part 2.
@@ -69,26 +80,6 @@ def buildTab2(gaps, lens, files):
                 out.append(i)   
     return out
 
-def part1(gaps, files):
-    # break condition: trying to add a file with id i
-    # to a gap with index >= i
-    breakLoops = False
-    indG = 0
-    indF = len(files) - 1
-    while not breakLoops:
-        movedFiles = []
-        while gaps[indG] > len(movedFiles) and not breakLoops:
-            movedFiles.append(indF)
-            files[indF] = files[indF] - 1
-            if files[indF] == 0:
-                indF -= 1
-            if indG >= indF:
-                breakLoops = True
-        #print(movedFiles)
-        gaps[indG] = movedFiles
-        indG += 1
-        #print(buildString(gaps, files))
-    return gaps, files
 
 def part2(gapLengths, files):
     # having gaps AND gapLengths allows for multiple files
@@ -98,9 +89,9 @@ def part2(gapLengths, files):
     indF = len(files) - 1 # treat files from last to first
     while indF != -1:
         # searching for a gap big enough for the file
-        while indG < len(gaps) and files[indF] > gapLengths[indG]:
+        while indG < len(gaps) and indG < indF and files[indF] > gapLengths[indG]:
             indG += 1
-        if indG == len(gaps): # no gap big enough for file
+        if indG == len(gaps) or indG == indF: # no gap to the left big enough for file
             indF -= 1
             indG = 0
             continue
@@ -126,10 +117,8 @@ def calcChecksum(tab):
         i += 1
     return checksum
 
-#print(buildTab1(gaps, files)) # intial state of memory
-#finalTab = buildTab1(*part1(gaps, files))
-finalTab = buildTab2(*part2(gaps, files), files)
-# print(tabToStringTest(finalTab))
-print(calcChecksum(finalTab))
+# lists passed as copies coz otherwise part1 modifies global variables for some reason
+print("part1: ", calcChecksum(buildTab1(*part1(copy.copy(gaps), copy.copy(files)))))
+print("part2: ", calcChecksum(buildTab2(*part2(gaps, files), files)))
 
 
